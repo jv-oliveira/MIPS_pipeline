@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set(GHDL_FLAGS --std=08 --ieee=synopsys)
+set(GHDL_FLAGS --std=08 --ieee=synopsys -fcolor-diagnostics)
 
 # Add sources macro
 macro (add_sources)

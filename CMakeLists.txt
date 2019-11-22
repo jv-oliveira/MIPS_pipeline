@@ -35,7 +35,7 @@ add_subdirectory(test/)
 # ghdl flags
 set(GHDL_FLAGS --std=08 --ieee=synopsys)
 
-add_custom_target(index ALL COMMAND ghdl -i ${GHDL_FLAGS} --workdir=${CMAKE_CURRENT_BINARY_DIR} ${VHDL_SOURCES})
+add_custom_target(index ALL COMMAND ghdl -i ${GHDL_FLAGS} --workdir=${CMAKE_CURRENT_BINARY_DIR} ${VHDL_SOURCES} )
 
 # Add compile test target
 set(CTEST_OUTPUT_ON_FAILURE 1)

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set(GHDL_FLAGS --std=08 --ieee=synopsys)
+set(GHDL_FLAGS --std=08 --ieee=synopsys -fcolor-diagnostics)
 
 # Add test sources macro
 macro (add_test_sources)
@@ -31,10 +31,13 @@ macro (add_test_sources)
         file(MAKE_DIRECTORY ${TRACE_PATH})
         set(TRACE_PATH "${TRACE_PATH}/${ENTITY_NAME}.vcd")
 
-        add_custom_target("${TEST_NAME}" COMMAND ghdl -m ${GHDL_FLAGS} --workdir=${CMAKE_BINARY_DIR} ${ENTITY_NAME} DEPENDS index)
+        add_custom_target("${TEST_NAME}" COMMAND ghdl -m -g ${GHDL_FLAGS} --workdir=${CMAKE_BINARY_DIR} ${ENTITY_NAME} DEPENDS index )
         list (APPEND VHDL_SOURCES "${CMAKE_SOURCE_DIR}/${FILE_SRC}")
-        add_test(NAME "${TEST_NAME}" COMMAND ghdl -r --workdir=${CMAKE_BINARY_DIR} ${ENTITY_NAME} --vcd=${TRACE_PATH})
-
+        add_custom_target("${TEST_NAME}_cp_mif_files" COMMAND sh -c "ln -s ${CMAKE_BINARY_DIR}/*.mif ${CMAKE_CURRENT_BINARY_DIR}" || true)
+        add_custom_target("${TEST_NAME}_cp_dat_files" COMMAND sh -c "ln -s ${CMAKE_BINARY_DIR}/*.dat ${CMAKE_CURRENT_BINARY_DIR}" || true)
+        add_test(NAME "${TEST_NAME}" COMMAND ghdl -r -g --workdir=${CMAKE_BINARY_DIR} ${ENTITY_NAME} --vcd=${TRACE_PATH})
+        add_dependencies("${TEST_NAME}" "${TEST_NAME}_cp_mif_files")
+        add_dependencies("${TEST_NAME}" "${TEST_NAME}_cp_dat_files")
         add_dependencies(check "${TEST_NAME}")
 
         message("-- Adding VHDL Test: ${CMAKE_SOURCE_DIR}/${FILE_SRC}")
