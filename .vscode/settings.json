@@ -1,0 +1,12 @@
+{
+    "files.autoGuessEncoding": false,
+    "files.defaultLanguage": "VHDL",
+    "files.encoding": "iso88591",
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "files.autoSave": "afterDelay",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+}
