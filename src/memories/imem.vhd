@@ -13,7 +13,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all; use STD.TEXTIO.all;
-use IEEE.NUMERIC_STD_UNSIGNED.all;
+use ieee.numeric_std_unsigned.all;
 
 entity imem is -- instruction memory
   port (
@@ -50,7 +50,7 @@ begin
         else report "Format error on line " & integer'image(index)
              severity error;
         end if;
-        mem(index)(35-i*4 downto 32-i*4) :=to_std_logic_vector(result,4);
+        mem(index)(35-i*4 downto 32-i*4) := to_std_logic_vector(result, 4);
       end loop;
       index := index + 1;
     end loop;
