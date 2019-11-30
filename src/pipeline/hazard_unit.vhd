@@ -13,6 +13,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
+use IEEE.numeric_std_unsigned.all;
 
 entity hazard_unit is
   port (
@@ -50,9 +51,9 @@ begin
 
   FOWARDING_A : process( all )
   begin
-    if RsE /= 0 and RsE = WriteRegM and RegWriteW then
+    if ((to_integer(RsE) /= 0) and (RsE = WriteRegM) and (RegWriteW = '1')) then
       ForwardAE <= "10";
-    elsif RsE /= 0 and RsE = WriteRegW and RegWriteW then
+    elsif ((to_integer(RsE) /= 0) and (RsE = WriteRegW) and (RegWriteW = '1')) then
       ForwardAE <= "01";
     else 
       ForwardAE <= "00";
@@ -61,9 +62,9 @@ begin
 
   FOWARDING_B : process( all )
   begin
-    if RtE /= 0 and RtE = WriteRegM and RegWriteW then
+    if ((to_integer(RtE) /= 0) and (RtE = WriteRegM) and (RegWriteW = '1')) then
       ForwardBE <= "10";
-    elsif RtE /= 0 and RtE = WriteRegW and RegWriteW then
+    elsif ((to_integer(RtE) /= 0) and (RtE = WriteRegW) and (RegWriteW = '1')) then
       ForwardBE <= "01";
     else 
       ForwardBE <= "00";
@@ -71,10 +72,10 @@ begin
   end process ; -- FOWARDING_B
 
   -- STALLS
-  s_lwstall <= '1' when (((RsD = RtE) or (RtD = RtE)) and MemtoRegE) else '0';
+  s_lwstall <= '1' when (((RsD = RtE) or (RtD = RtE)) and (MemtoRegE = '1')) else '0';
 
-  s_branchstallE <= '1' when (BranchD and RegWriteE and (WriteRegE = RsD or WriteRegE = RtD)) else '0';
-  s_branchstallM <= '1' when (BranchD and MemtoRegM and (WriteRegM = RsD or WriteRegM = RtD)) else '0';
+  s_branchstallE <= '1' when ((BranchD = '1') and (RegWriteE = '1') and (WriteRegE = RsD or WriteRegE = RtD)) else '0';
+  s_branchstallM <= '1' when ((BranchD = '1') and (MemtoRegM = '1') and (WriteRegM = RsD or WriteRegM = RtD)) else '0';
   s_branchstall <= s_branchstallE or s_branchstallM; 
 
   StallF <= s_lwstall or s_branchstall;
@@ -82,8 +83,7 @@ begin
   FlushE <= s_lwstall or s_branchstall;
 
   -- CONTROL HAZARDS
-  ForwardAD <= '1' when (RsD /= 0 and RsD = WriteRegM and RegWriteM) else '0';
-  ForwardBD <= '1' when (RtD /= 0 and RtD = WriteRegM and RegWriteM) else '0';
-
-
+  ForwardAD <= '1' when (to_integer(RsD) /= 0 and RsD = WriteRegM and RegWriteM = '1') else '0';
+  ForwardBD <= '1' when (to_integer(RtD) /= 0 and RtD = WriteRegM and RegWriteM = '1') else '0';
+  
 end architecture ; -- bhv

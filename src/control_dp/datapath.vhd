@@ -17,18 +17,37 @@ use IEEE.numeric_std_unsigned.all;
 
 entity datapath is  -- MIPS datapath
   port (
-    clk, reset:        in  std_logic;
-    memtoreg, pcsrc:   in  std_logic;
-    alusrc, regdst:    in  std_logic;
-    regwrite, jump:    in  std_logic;
-    alucontrol:        in  std_logic_vector(2 downto 0);
-    zero:              out std_logic;
-    pc:                buffer std_logic_vector(31 downto 0);
-    instr:             in  std_logic_vector(31 downto 0);
-    aluout, writedata: buffer std_logic_vector(31 downto 0);
-    RsD, RtD, RsE, RtE:out  std_logic_vector(31 downto 0);
+    clk, reset:         in  std_logic;
+    -- from instruction memory
+    InstrF: in std_logic_vector(31 downto 0);
+    -- from Data memory
+    ReadDataM:          in  std_logic_vector(31 downto 0);
+    -- from controller
+    RegWriteD:    in std_logic;
+    MemtoRegD:    in std_logic;
+    MemWriteD:    in std_logic;
+    BranchD:      in std_logic;
+    ALUControlD:  in std_logic_vector(2 downto 0);
+    ALUSrcD:      in std_logic;
+    RegDstD:      in std_logic;
+    -- fom hazard unit
+    StallF, StallD:     in  std_logic;
+    ForwardAD, ForwardBD: in std_logic;
+    FlushE:             in  std_logic;
+    ForwardAE, ForwardBE: in std_logic_vector(1 downto 0);
+    -- to instruction memory
+    PCF:  out std_logic_vector(31 downto 0);
+    -- to hazard unit
+    RegWriteE, RegWriteM, RegWriteW: out  std_logic;
+    MemtoRegE, MemtoRegM: out std_logic;
+    RsD, RtD, RsE, RtE: out  std_logic_vector(4 downto 0);
     WriteRegE, WriteRegM, WriteRegW: out std_logic_vector(4 downto 0);
-    readdata:          in  std_logic_vector(31 downto 0));
+    -- to controller
+    EqualD:             out  std_logic;
+    -- to Data memory
+    ALUOutM:    out std_logic_vector(31 downto 0);
+    WriteDataM: out std_logic_vector(31 downto 0)
+  );
 end;
 
 architecture struct of datapath is
@@ -164,7 +183,7 @@ architecture struct of datapath is
   signal s_RsD, s_RtD, s_RdD, s_RdE: std_logic_vector(4 downto 0);
   signal s_RsE, s_RtE: std_logic_vector(4 downto 0);
   
-  signal s_PCSrcD, s_EqualD: std_logic;
+  signal s_PCSrcD: std_logic;
 
   signal s_SignImmD, s_SignImmDsh, s_SignImmE: std_logic_vector(31 downto 0) ;
 
@@ -183,6 +202,57 @@ architecture struct of datapath is
   signal s_ReadDataM, s_ReadDataW: std_logic_vector(31 downto 0);
 
 begin
+  -- ############
+  -- INPUTS
+  -- ############
+
+  -- from instruction memory
+  s_InstrF <= InstrF;
+  -- from data memory
+  s_ReadDataM <= ReadDataM;
+  -- from controller
+  s_RegWriteD <= RegWriteD;
+  s_MemtoRegD <= MemtoRegD;
+  s_MemWriteD <= MemWriteD;
+  s_BranchD <= BranchD;
+  s_ALUControlD <= ALUControlD;
+  s_ALUSrcD <= ALUSrcD;
+  s_RegDstD <= RegDstD;
+  -- from hazard units
+  s_StallF <= StallF;
+  s_StallD <= StallD;
+  s_ForwardAD <= ForwardAD;
+  s_ForwardBD <= ForwardBD;
+  s_FlushE <=  FlushE;
+  s_ForwardAE <=  ForwardAE;
+  s_ForwardBE <=  ForwardBE;
+
+  -- ############
+  -- OUTPUTS
+  -- ############
+
+  -- to instruction memory
+  PCF <= s_PCF;
+  -- to hazard unit
+  RegWriteE <= s_RegWriteE;
+  RegWriteM <= s_RegWriteM;
+  RegWriteW <= s_RegWriteW;
+  MemtoRegE <= s_MemtoRegE;
+  MemtoRegM <= s_MemtoRegM;
+  RsD <= s_RsD;
+  RtD <= s_RtD;
+  RsE <= s_RsE;
+  RtE <= s_RtE;
+  WriteRegE <= s_WriteRegE;
+  WriteRegM <= s_WriteRegM;
+  WriteRegW <= s_WriteRegW;
+  -- to controller
+  EqualD <= '1' when s_RD1D = s_RD2D else '0';
+  -- to Data memory
+  ALUOutM <= s_ALUOutM;
+  WriteDataM <= s_WriteDataM;
+  
+
   -- ############
   -- FETCH
   -- ############
@@ -236,10 +306,7 @@ begin
 
   s_RD1D <= s_RD1 when s_ForwardAD = '0' else s_ALUOutM;
   s_RD2D <= s_RD2 when s_ForwardBD = '0' else s_ALUOutM;
-
-  s_EqualD <= '1' when s_RD1D = s_RD2D else '0';
-
-  s_PCSrcD <= s_EqualD and s_BranchD;
+  
 
   -- signal extender
   s_SignImmD <= X"ffff" & s_InstrD(15 downto 0) when s_InstrD(15) else X"0000" & s_InstrD(15 downto 0);
