@@ -48,6 +48,7 @@ end regE ;
 architecture bhv of regE is
 begin
   process( all )
+  begin
     if clr = '1' then
       RegWriteE <= '0';
       MemtoRegE <= '0';

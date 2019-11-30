@@ -46,8 +46,10 @@ architecture struct of mips is
       alucontrol:        in  std_logic_vector(2 downto 0);
       zero:              out std_logic;
       pc:                buffer std_logic_vector(31 downto 0);
-      instr:             in std_logic_vector(31 downto 0);
+      instr:             in  std_logic_vector(31 downto 0);
       aluout, writedata: buffer std_logic_vector(31 downto 0);
+      RsD, RtD, RsE, RtE:out std_logic_vector(31 downto 0);
+      WriteRegE, WriteRegM, WriteRegW: out std_logic_vector(4 downto 0);
       readdata:          in  std_logic_vector(31 downto 0)
     );
   end component;
@@ -55,6 +57,10 @@ architecture struct of mips is
   signal memtoreg, alusrc, regdst, regwrite, jump, pcsrc: std_logic;
   signal zero: std_logic;
   signal alucontrol: std_logic_vector(2 downto 0);
+
+  signal s_WriteRegM, s_WriteRegW, s_WriteRegE: std_logic_vector(4 downto 0);
+  signal s_RsD, s_RtD, s_RsE, s_RtE: std_logic_vector(31 downto 0);
+
 begin
   cont: controller 
   port map (
@@ -86,7 +92,14 @@ begin
     pc, 
     instr,
     aluout, 
-    writedata, 
+    writedata,
+    s_RsD,
+    s_RtD,
+    s_RsE,
+    s_RtE,
+    s_WriteRegE,
+    s_WriteRegM,
+    s_WriteRegW,
     readdata
   );
 end;

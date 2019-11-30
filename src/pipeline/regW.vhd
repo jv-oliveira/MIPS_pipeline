@@ -31,11 +31,12 @@ entity regW is
     ALUOutW:    out std_logic_vector(31 downto 0);
     WriteRegW:  out std_logic_vector(4 downto 0)
   );
-end regW ;
+end regW;
 
 architecture bhv of regW is
 begin
   process( all )
+  begin
     if clr = '1' then
       RegWriteW <= '0';
       MemtoRegW <= '0';

@@ -29,7 +29,7 @@ entity hazard_unit is
     MemtoRegM:  in  std_logic;
     RegWriteM:  in  std_logic;
     WriteRegW:  in  std_logic_vector(4 downto 0);
-    RegWriteW:  in  std_logic
+    RegWriteW:  in  std_logic;
     StallF:     out std_logic;
     StallD:     out std_logic;
     ForwardAD:  out std_logic;
@@ -50,9 +50,9 @@ begin
 
   FOWARDING_A : process( all )
   begin
-    if RsE != 0 and RsE == WriteRegM and RegWriteW then
+    if RsE /= 0 and RsE = WriteRegM and RegWriteW then
       ForwardAE <= "10";
-    elsif RsE != 0 and RsE == WriteRegW and RegWriteW then
+    elsif RsE /= 0 and RsE = WriteRegW and RegWriteW then
       ForwardAE <= "01";
     else 
       ForwardAE <= "00";
@@ -61,9 +61,9 @@ begin
 
   FOWARDING_B : process( all )
   begin
-    if RtE != 0 and RtE == WriteRegM and RegWriteW then
+    if RtE /= 0 and RtE = WriteRegM and RegWriteW then
       ForwardBE <= "10";
-    elsif RtE != 0 and RtE == WriteRegW and RegWriteW then
+    elsif RtE /= 0 and RtE = WriteRegW and RegWriteW then
       ForwardBE <= "01";
     else 
       ForwardBE <= "00";

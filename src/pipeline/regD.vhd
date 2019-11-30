@@ -31,6 +31,7 @@ end regD ;
 architecture bhv of regD is
 begin
   process( all )
+  begin
     if clr = '1' then
       InstrD <= (others => '0');
       PCPlus4D <= (others => '0');

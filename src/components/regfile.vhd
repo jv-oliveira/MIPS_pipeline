@@ -35,7 +35,7 @@ begin
   -- note: for pipelined processor, write third port
   -- on falling edge of clk
   process(clk) begin
-    if rising_edge(clk) then
+    if falling_edge(clk) then
        if we3 = '1' then mem(to_integer(wa3)) <= wd3;
        end if;
     end if;
