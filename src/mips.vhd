@@ -37,56 +37,168 @@ architecture struct of mips is
     );
   end component;
   
-  component datapath
+  component datapath is  -- MIPS datapath
     port (
-      clk, reset:        in  std_logic;
-      memtoreg, pcsrc:   in  std_logic;
-      alusrc, regdst:    in  std_logic;
-      regwrite, jump:    in  std_logic;
-      alucontrol:        in  std_logic_vector(2 downto 0);
-      zero:              out std_logic;
-      pc:                buffer std_logic_vector(31 downto 0);
-      instr:             in std_logic_vector(31 downto 0);
-      aluout, writedata: buffer std_logic_vector(31 downto 0);
-      readdata:          in  std_logic_vector(31 downto 0)
+      clk, reset:         in  std_logic;
+      -- from instruction memory
+      InstrF: in std_logic_vector(31 downto 0);
+      -- from Data memory
+      ReadDataM:          in  std_logic_vector(31 downto 0);
+      -- from controller
+      RegWriteD:    in std_logic;
+      MemtoRegD:    in std_logic;
+      MemWriteD:    in std_logic;
+      BranchD:      in std_logic;
+      ALUControlD:  in std_logic_vector(2 downto 0);
+      ALUSrcD:      in std_logic;
+      RegDstD:      in std_logic;
+      -- fom hazard unit
+      StallF, StallD:     in  std_logic;
+      ForwardAD, ForwardBD: in std_logic;
+      FlushE:             in  std_logic;
+      ForwardAE, ForwardBE: in std_logic_vector(1 downto 0);
+      -- to instruction memory
+      PCF:  out std_logic_vector(31 downto 0);
+      -- to hazard unit
+      RegWriteE, RegWriteM, RegWriteW: out  std_logic;
+      MemtoRegE, MemtoRegM: out std_logic;
+      RsD, RtD, RsE, RtE: out  std_logic_vector(4 downto 0);
+      WriteRegE, WriteRegM, WriteRegW: out std_logic_vector(4 downto 0);
+      -- to controller
+      EqualD:             out  std_logic;
+      -- to Data memory
+      ALUOutM:    out std_logic_vector(31 downto 0);
+      WriteDataM: out std_logic_vector(31 downto 0)
+    );
+  end component;
+
+  component hazard_unit is
+    port (
+      clock:      in  std_logic;
+      RsD:        in  std_logic_vector(4 downto 0);
+      RtD:        in  std_logic_vector(4 downto 0);
+      RsE:        in  std_logic_vector(4 downto 0);
+      RtE:        in  std_logic_vector(4 downto 0);
+      BranchD:    in  std_logic;
+      WriteRegE:  in  std_logic_vector(4 downto 0);
+      MemtoRegE:  in  std_logic;
+      RegWriteE:  in  std_logic;
+      WriteRegM:  in  std_logic_vector(4 downto 0);
+      MemtoRegM:  in  std_logic;
+      RegWriteM:  in  std_logic;
+      WriteRegW:  in  std_logic_vector(4 downto 0);
+      RegWriteW:  in  std_logic;
+      StallF:     out std_logic;
+      StallD:     out std_logic;
+      ForwardAD:  out std_logic;
+      ForwardBD:  out std_logic;
+      FlushE:     out std_logic;
+      ForwardAE:  out std_logic_vector(1 downto 0);
+      ForwardBE:  out std_logic_vector(1 downto 0)
     );
   end component;
 
   signal memtoreg, alusrc, regdst, regwrite, jump, pcsrc: std_logic;
   signal zero: std_logic;
   signal alucontrol: std_logic_vector(2 downto 0);
+
+  signal s_EqualD, s_MemtoRegD, s_MemWriteD: std_logic;
+  signal s_PCSrcD, s_ALUSrcD, s_RegDstD, s_RegWriteD, s_BranchD: std_logic;
+
+  signal s_ALUControlD: std_logic_vector(2 downto 0);
+
+  signal s_StallF, s_StallD, s_ForwardAD, s_ForwardBD, s_FlushE: std_logic;
+  signal s_ForwardAE, s_ForwardBE: std_logic_vector(1 downto 0);  
+
+  signal s_RegWriteE, s_RegWriteM, s_RegWriteW: std_logic;
+  signal s_MemtoRegE, s_MemtoRegM:std_logic;
+  signal s_RsD, s_RtD, s_RsE, s_RtE: std_logic_vector(4 downto 0);
+  signal s_WriteRegE, s_WriteRegM, s_WriteRegW: std_logic_vector(4 downto 0);
+
 begin
   cont: controller 
   port map (
-    instr(31 downto 26),
-    instr(5 downto 0),
-    zero,
-    memtoreg,
-    memwrite,
-    pcsrc,
-    alusrc,
-    regdst,
-    regwrite,
-    jump,
-    alucontrol
+    op => instr(31 downto 26),
+    funct => instr(5 downto 0),
+    zero => s_EqualD,
+    memtoreg => s_MemtoRegD,
+    memwrite => s_MemWriteD,
+    pcsrc => s_PCSrcD,
+    alusrc => s_ALUSrcD,
+    regdst => s_RegDstD,
+    regwrite => s_RegWriteD,
+    jump => s_BranchD,
+    alucontrol => s_ALUControlD
   );
 
   dp: datapath 
   port map (
-    clk,
-    reset, 
-    memtoreg, 
-    pcsrc, 
-    alusrc, 
-    regdst,
-    regwrite, 
-    jump, 
-    alucontrol, 
-    zero, 
-    pc, 
-    instr,
-    aluout, 
-    writedata, 
-    readdata
+    clk => clk,
+    reset => reset,
+    -- from instruction memory
+    InstrF => instr,
+    -- from Data memory
+    ReadDataM => readdata,
+    -- from controller
+    RegWriteD => s_RegWriteD,
+    MemtoRegD => s_MemtoRegD,
+    MemWriteD => s_MemWriteD,
+    BranchD => s_BranchD,
+    ALUControlD => s_ALUControlD,
+    ALUSrcD => s_ALUSrcD,
+    RegDstD => s_RegDstD,
+    -- fom hazard unit
+    StallF => s_StallF,
+    StallD => s_StallD,
+    ForwardAD => s_ForwardAD,
+    ForwardBD => s_ForwardBD,
+    FlushE => s_FlushE,
+    ForwardAE => s_ForwardAE,
+    ForwardBE => s_ForwardBE,
+    -- to instruction memory
+    PCF => pc,
+    -- to hazard unit
+    RegWriteE => s_RegWriteE,
+    RegWriteM => s_RegWriteM,
+    RegWriteW => s_RegWriteW,
+    MemtoRegE => s_MemtoRegE,
+    MemtoRegM => s_MemtoRegM,
+    RsD => s_RsD,
+    RtD => s_RtD,
+    RsE => s_RsE,
+    RtE => s_RtE,
+    WriteRegE => s_WriteRegE,
+    WriteRegM => s_WriteRegM,
+    WriteRegW => s_WriteRegW,
+    -- to controller
+    EqualD => s_EqualD,
+    -- to Data memory
+    ALUOutM => aluout,
+    WriteDataM => writedata
+  );
+
+  hu: hazard_unit
+  port map (
+    clock => clk,
+    RsD => s_RsD,
+    RtD => s_RtD,
+    RsE => s_RsE,
+    RtE => s_RtE,
+    BranchD => s_BranchD,
+    WriteRegE => s_WriteRegE,
+    MemtoRegE => s_MemtoRegE,
+    RegWriteE => s_RegWriteE,
+    WriteRegM => s_WriteRegM,
+    MemtoRegM => s_MemtoRegM,
+    RegWriteM => s_RegWriteM,
+    WriteRegW => s_WriteRegW,
+    RegWriteW => s_RegWriteW,
+    StallF => s_StallF,
+    StallD => s_StallD,
+    ForwardAD => s_ForwardAD,
+    ForwardBD => s_ForwardBD,
+    FlushE => s_FlushE,
+    ForwardAE => s_ForwardAE,
+    ForwardBE => s_ForwardBE
   );
 end;

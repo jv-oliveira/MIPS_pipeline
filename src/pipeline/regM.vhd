@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- Disciplina : PCS3612 ? Organização e Arquitetura de Computadores I 
+-- Disciplina : PCS3612 - Organização e Arquitetura de Computadores I 
 -- Professor(a): Profa. Dra. Cíntia Borges Margi                      
 -- Projeto :  Implementação do MIPS pipeline                          
 -- Autores :                                                          
@@ -24,14 +24,14 @@ entity regM is
     RegWriteE:  in  std_logic;
     MemtoRegE:  in  std_logic;
     MemWriteE:  in  std_logic;
-    ALUOutE:    in  std_logic_vector(31 downto 0) ;
-    WriteDataE: in  std_logic_vector(31 downto 0) ;
-    WriteRegE:  in  std_logic_vector(4 downto 0) ;
+    ALUOutE:    in  std_logic_vector(31 downto 0);
+    WriteDataE: in  std_logic_vector(31 downto 0);
+    WriteRegE:  in  std_logic_vector(4 downto 0);
     RegWriteM:  out std_logic;
     MemtoRegM:  out std_logic;
     MemWriteM:  out std_logic;
-    ALUOutM:    out std_logic_vector(31 downto 0) ;
-    WriteDataM: out std_logic_vector(31 downto 0) ;
+    ALUOutM:    out std_logic_vector(31 downto 0);
+    WriteDataM: out std_logic_vector(31 downto 0);
     WriteRegM:  out std_logic_vector(4 downto 0)
   );
 end regM ;
@@ -39,6 +39,7 @@ end regM ;
 architecture bhv of regM is
 begin
   process( all )
+  begin
     if clr = '1' then
       RegWriteM <= '0';
       MemtoRegM <= '0';

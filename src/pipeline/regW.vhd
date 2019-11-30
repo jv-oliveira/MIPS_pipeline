@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- Disciplina : PCS3612 ? Organização e Arquitetura de Computadores I 
+-- Disciplina : PCS3612 - Organização e Arquitetura de Computadores I 
 -- Professor(a): Profa. Dra. Cíntia Borges Margi                      
 -- Projeto :  Implementação do MIPS pipeline                          
 -- Autores :                                                          
@@ -31,11 +31,12 @@ entity regW is
     ALUOutW:    out std_logic_vector(31 downto 0);
     WriteRegW:  out std_logic_vector(4 downto 0)
   );
-end regW ;
+end regW;
 
 architecture bhv of regW is
 begin
   process( all )
+  begin
     if clr = '1' then
       RegWriteW <= '0';
       MemtoRegW <= '0';

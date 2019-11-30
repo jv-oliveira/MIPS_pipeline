@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- Disciplina : PCS3612 ? Organização e Arquitetura de Computadores I 
+-- Disciplina : PCS3612 - Organização e Arquitetura de Computadores I 
 -- Professor(a): Profa. Dra. Cíntia Borges Margi                      
 -- Projeto :  Implementação do MIPS pipeline                          
 -- Autores :                                                          
@@ -31,6 +31,7 @@ end regD ;
 architecture bhv of regD is
 begin
   process( all )
+  begin
     if clr = '1' then
       InstrD <= (others => '0');
       PCPlus4D <= (others => '0');

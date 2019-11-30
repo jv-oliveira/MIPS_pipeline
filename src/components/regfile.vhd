@@ -1,14 +1,14 @@
 ----------------------------------------------------------------------
--- Disciplina : PCS3612 ? Organização e Arquitetura de Computadores I 
--- Professor(a): Profa. Dra. Cíntia Borges Margi                      
--- Projeto :  Implementação do MIPS pipeline                          
+-- Disciplina : PCS3612 - Organizaï¿½ï¿½o e Arquitetura de Computadores I 
+-- Professor(a): Profa. Dra. Cï¿½ntia Borges Margi                      
+-- Projeto :  Implementaï¿½ï¿½o do MIPS pipeline                          
 -- Autores :                                                          
---   João Victor Marques de Oliveira | Nº USP: 9344790                
---   Matheus Felipe Gomes            | Nº USP: 8993198                
--- Data de criação : 21/11/2019       
+--   Joï¿½o Victor Marques de Oliveira | Nï¿½ USP: 9344790                
+--   Matheus Felipe Gomes            | Nï¿½ USP: 8993198                
+-- Data de criaï¿½ï¿½o : 21/11/2019       
 -- Arquivo : regfile.vhd                                             
 ----------------------------------------------------------------------
--- Descrição : Banco de 32 registradores de 32 bits. 
+-- Descriï¿½ï¿½o : Banco de 32 registradores de 32 bits. 
 ----------------------------------------------------------------------
 
 library IEEE; use IEEE.std_logic_1164.all;
@@ -35,7 +35,7 @@ begin
   -- note: for pipelined processor, write third port
   -- on falling edge of clk
   process(clk) begin
-    if rising_edge(clk) then
+    if falling_edge(clk) then
        if we3 = '1' then mem(to_integer(unsigned(wa3))) <= wd3;
        end if;
     end if;
