@@ -28,6 +28,30 @@ entity datapath is  -- MIPS datapath
 end;
 
 architecture struct of datapath is
+
+  -- pipeline signal related to Control Unit
+  signal s_RegWriteD  ,   s_RegWriteE   , s_RegWriteM , s_RegWriteW : std_logic;
+  signal s_MemtoRegD  ,   s_MemtoRegE   , s_MemtoRegM , s_MemtoRegW : std_logic;
+  signal s_MemWriteD  ,   s_MemWriteE   , s_MemWriteM               : std_logic;
+  signal s_BranchD    ,   s_BranchE     , s_BranchM                 : std_logic;
+  signal s_ALUControlD,   s_ALUControlE                             : std_logic_vector(2 downto 0);
+  signal s_ALUSrcD    ,   s_ALUSrcE                                 : std_logic;
+  signal s_RegDstD    ,   s_RegDstE                                 : std_logic;
+  signal s_PCSrcM                                                   : std_logic;
+
+
+  signal s_StallF, s_StallD: std_logic;
+  signal s_BranchD: std_logic;
+  signal s_ForwardAD, s_ForwardBD: std_logic;
+  signal s_FlushE: std_logic;
+  signal s_ForwardAE, s_ForwardBE: std_logic;
+  signal s_MemtoRegE, s_RegWriteE: std_logic;
+  signal s_MemtoRegM, s_RegWriteM: std_logic;
+  signal s_RegWriteW: std_logic;
+  signal s_RsD, s_RtD: std_logic_vector(4 downto 0);
+  signal s_RsE, s_RtE: std_logic_vector(4 downto 0);
+
+
   component alu
     port (
       a, b:       in  std_logic_vector(31 downto 0);
