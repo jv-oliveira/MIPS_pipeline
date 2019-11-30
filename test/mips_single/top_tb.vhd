@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------
--- Disciplina : PCS3612 ? Organiza??o e Arquitetura de Computadores I 
--- Professor(a): Profa. Dra. C?ntia Borges Margi                      
--- Projeto :  Implementa??o do MIPS pipeline                          
+-- Disciplina : PCS3612 - Organização e Arquitetura de Computadores I 
+-- Professor(a): Profa. Dra. Cíntia Borges Margi                      
+-- Projeto :  Implementação do MIPS pipeline                          
 -- Autores :                                                          
---   Jo?o Victor Marques de Oliveira | Nº USP: 9344790                
+--   João Victor Marques de Oliveira | Nº USP: 9344790                
 --   Matheus Felipe Gomes            | Nº USP: 8993198                
--- Data de cria??o : 21/11/2019       
+-- Data de criação : 21/11/2019       
 -- Arquivo : top_tb.vhd                                             
 ----------------------------------------------------------------------
 -- Descri??o : Testbench do MIPS de ciclo único

@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- Disciplina : PCS3612 ? Organização e Arquitetura de Computadores I 
+-- Disciplina : PCS3612 - Organização e Arquitetura de Computadores I 
 -- Professor(a): Profa. Dra. Cíntia Borges Margi                      
 -- Projeto :  Implementação do MIPS pipeline                          
 -- Autores :                                                          
