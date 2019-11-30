@@ -13,7 +13,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all;
 
-entity mips is -- single cycle MIPS processor
+entity mips is
   port (
     clk, reset:        in  std_logic;
     pc:                out std_logic_vector(31 downto 0);
@@ -48,10 +48,10 @@ architecture struct of mips is
       RegWriteD:    in std_logic;
       MemtoRegD:    in std_logic;
       MemWriteD:    in std_logic;
-      BranchD:      in std_logic;
       ALUControlD:  in std_logic_vector(2 downto 0);
       ALUSrcD:      in std_logic;
       RegDstD:      in std_logic;
+      PCSrcD:       in std_logic;
       -- fom hazard unit
       StallF, StallD:     in  std_logic;
       ForwardAD, ForwardBD: in std_logic;
@@ -66,7 +66,9 @@ architecture struct of mips is
       WriteRegE, WriteRegM, WriteRegW: out std_logic_vector(4 downto 0);
       -- to controller
       EqualD:             out  std_logic;
+      Op, Funct: out  std_logic_vector(5 downto 0);
       -- to Data memory
+      MemWriteM:  out std_logic;
       ALUOutM:    out std_logic_vector(31 downto 0);
       WriteDataM: out std_logic_vector(31 downto 0)
     );
@@ -115,11 +117,12 @@ architecture struct of mips is
   signal s_RsD, s_RtD, s_RsE, s_RtE: std_logic_vector(4 downto 0);
   signal s_WriteRegE, s_WriteRegM, s_WriteRegW: std_logic_vector(4 downto 0);
 
+  signal s_Op, s_Funct: std_logic_vector(5 downto 0);
 begin
   cont: controller 
   port map (
-    op => instr(31 downto 26),
-    funct => instr(5 downto 0),
+    op => s_Op,
+    funct => s_Funct,
     zero => s_EqualD,
     memtoreg => s_MemtoRegD,
     memwrite => s_MemWriteD,
@@ -143,10 +146,10 @@ begin
     RegWriteD => s_RegWriteD,
     MemtoRegD => s_MemtoRegD,
     MemWriteD => s_MemWriteD,
-    BranchD => s_BranchD,
     ALUControlD => s_ALUControlD,
     ALUSrcD => s_ALUSrcD,
     RegDstD => s_RegDstD,
+    PCSrcD => s_PCSrcD,
     -- fom hazard unit
     StallF => s_StallF,
     StallD => s_StallD,
@@ -172,7 +175,10 @@ begin
     WriteRegW => s_WriteRegW,
     -- to controller
     EqualD => s_EqualD,
+    Op => s_Op,
+    Funct => s_Funct,
     -- to Data memory
+    MemWriteM => memwrite,
     ALUOutM => aluout,
     WriteDataM => writedata
   );

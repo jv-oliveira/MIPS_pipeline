@@ -13,7 +13,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.numeric_std_unsigned.all;
+use IEEE.numeric_std.all;
 
 entity datapath is  -- MIPS datapath
   port (
@@ -26,10 +26,10 @@ entity datapath is  -- MIPS datapath
     RegWriteD:    in std_logic;
     MemtoRegD:    in std_logic;
     MemWriteD:    in std_logic;
-    BranchD:      in std_logic;
     ALUControlD:  in std_logic_vector(2 downto 0);
     ALUSrcD:      in std_logic;
     RegDstD:      in std_logic;
+    PCSrcD:       in std_logic;
     -- fom hazard unit
     StallF, StallD:     in  std_logic;
     ForwardAD, ForwardBD: in std_logic;
@@ -43,8 +43,10 @@ entity datapath is  -- MIPS datapath
     RsD, RtD, RsE, RtE: out  std_logic_vector(4 downto 0);
     WriteRegE, WriteRegM, WriteRegW: out std_logic_vector(4 downto 0);
     -- to controller
-    EqualD:             out  std_logic;
+    EqualD:   out  std_logic;
+    Op, Funct: out  std_logic_vector(5 downto 0);
     -- to Data memory
+    MemWriteM:  out std_logic;
     ALUOutM:    out std_logic_vector(31 downto 0);
     WriteDataM: out std_logic_vector(31 downto 0)
   );
@@ -99,6 +101,7 @@ architecture struct of datapath is
       RsD:        in  std_logic_vector(4 downto 0);
       RtD:        in  std_logic_vector(4 downto 0);
       RdD:        in  std_logic_vector(4 downto 0);
+      SignImmD:   in  std_logic_vector(31 downto 0);
       RegWriteE:  out std_logic;
       MemtoRegE:  out std_logic;
       MemWriteE:  out std_logic;
@@ -109,7 +112,8 @@ architecture struct of datapath is
       RD2E:       out std_logic_vector(31 downto 0);
       RsE:        out std_logic_vector(4 downto 0);
       RtE:        out std_logic_vector(4 downto 0);
-      RdE:        out std_logic_vector(4 downto 0)
+      RdE:        out std_logic_vector(4 downto 0);
+      SignImmE:   out std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -159,6 +163,17 @@ architecture struct of datapath is
       clk, clr, en: in std_logic;
       D:            in   std_logic_vector(N-1 downto 0);
       Q:            out  std_logic_vector (N-1 downto 0)
+    );
+  end component;
+
+  component  mux4 is
+    generic (
+      width: integer
+    );
+    port (
+      d0, d1, d2, d3: in  std_logic_vector(width-1 downto 0);
+      s:      in  std_logic_vector(1 downto 0);
+      y:      out std_logic_vector(width-1 downto 0)
     );
   end component;
 
@@ -213,11 +228,11 @@ begin
   -- from controller
   s_RegWriteD <= RegWriteD;
   s_MemtoRegD <= MemtoRegD;
-  s_MemWriteD <= MemWriteD;
-  s_BranchD <= BranchD;
+  s_MemWriteD <= MemWriteD;  
   s_ALUControlD <= ALUControlD;
   s_ALUSrcD <= ALUSrcD;
   s_RegDstD <= RegDstD;
+  s_PCSrcD <= PCSrcD;
   -- from hazard units
   s_StallF <= StallF;
   s_StallD <= StallD;
@@ -248,7 +263,10 @@ begin
   WriteRegW <= s_WriteRegW;
   -- to controller
   EqualD <= '1' when s_RD1D = s_RD2D else '0';
+  Op <= s_InstrD(31 downto 26);
+  Funct <= s_InstrD(5 downto 0);
   -- to Data memory
+  MemWriteM <= s_MemWriteM;
   ALUOutM <= s_ALUOutM;
   WriteDataM <= s_WriteDataM;
   
@@ -270,7 +288,7 @@ begin
   );
 
   -- add 4, advancinf pc
-  s_PCPlus4F <= s_PCF + NEXT_PC_STEP;
+  s_PCPlus4F <= std_logic_vector(unsigned(s_PCF) + unsigned(NEXT_PC_STEP));
 
   -- ############
   -- IF/ID reg
@@ -304,6 +322,10 @@ begin
     s_RD2
   );
 
+  s_RsD <= s_InstrD(25 downto 21);
+  s_RtD <= s_InstrD(20 downto 16);
+  s_RdD <= s_InstrD(15 downto 11);
+
   s_RD1D <= s_RD1 when s_ForwardAD = '0' else s_ALUOutM;
   s_RD2D <= s_RD2 when s_ForwardBD = '0' else s_ALUOutM;
   
@@ -313,10 +335,7 @@ begin
 
   s_SignImmDsh <= s_SignImmD(29 downto 0) & "00";
 
-  s_PCBranchD <= s_PCPlus4D + s_SignImmDsh;
-
-  RsD <= s_RsD;
-  RtD <= s_RtD;
+  s_PCBranchD <= std_logic_vector(unsigned(s_PCPlus4D) + unsigned(s_SignImmDsh));  
 
   -- ############
   -- ID/EX reg
@@ -338,6 +357,7 @@ begin
     RsD => s_RsD,
     RtD => s_RtD,
     RdD => s_RdD,
+    SignImmD => s_SignImmD,
     RegWriteE => s_RegWriteE,
     MemtoRegE => s_MemtoRegE,
     MemWriteE => s_MemWriteE,
@@ -348,24 +368,35 @@ begin
     RD2E => s_RD2E,
     RsE => s_RsE,
     RtE => s_RtE,
-    RdE => s_RdE
+    RdE => s_RdE,
+    SignImmE => s_SignImmE
   );
 
   -- ############
   -- EXECUTION
   -- ############
 
-  with s_ForwardAE select
-    s_SrcAE <=  s_RD1E    when "00",
-                s_ResultW when "01",
-                s_ALUOutM when "10",
-                (others => '0') when others;
+  srcAmux: mux4
+  generic map(32)
+  port map (
+    s_RD1E,
+    s_ResultW,
+    s_ALUOutM,
+    X"00000000",
+    s_ForwardAE,
+    s_SrcAE
+  );
 
-  with s_ForwardBE select
-    s_WriteDataE <=   s_RD2E    when "00",
-                      s_ResultW when "01",
-                      s_ALUOutM when "10",
-                      (others => '0') when others;
+  wdEmux: mux4
+  generic map(32)
+  port map (
+    s_RD2E,
+    s_ResultW,
+    s_ALUOutM,
+    X"00000000",
+    s_ForwardBE,
+    s_WriteDataE
+  );
 
   s_SrcBE <= s_WriteDataE when s_ALUSrcE = '0' else s_SignImmE;
 
@@ -374,7 +405,7 @@ begin
     s_SrcAE, 
     s_SrcBE, 
     s_ALUControlE, 
-    s_ALUOutM, 
+    s_ALUOutE, 
     open -- TODO verificar isso aqui
   );
 

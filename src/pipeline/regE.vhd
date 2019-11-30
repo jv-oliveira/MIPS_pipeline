@@ -31,6 +31,7 @@ entity regE is
     RsD:        in  std_logic_vector(4 downto 0);
     RtD:        in  std_logic_vector(4 downto 0);
     RdD:        in  std_logic_vector(4 downto 0);
+    SignImmD:   in  std_logic_vector(31 downto 0);
     RegWriteE:  out std_logic;
     MemtoRegE:  out std_logic;
     MemWriteE:  out std_logic;
@@ -41,7 +42,8 @@ entity regE is
     RD2E:       out std_logic_vector(31 downto 0);
     RsE:        out std_logic_vector(4 downto 0);
     RtE:        out std_logic_vector(4 downto 0);
-    RdE:        out std_logic_vector(4 downto 0)
+    RdE:        out std_logic_vector(4 downto 0);
+    SignImmE:   out std_logic_vector(31 downto 0)
   );
 end regE ;
 
@@ -61,6 +63,7 @@ begin
       RsE <= (others => '0');
       RtE <= (others => '0');
       RdE <= (others => '0');
+      SignImmE <= (others => '0');
     elsif rising_edge(clk)  then
       if en = '1' then
         RegWriteE <= RegWriteD;
@@ -74,6 +77,7 @@ begin
         RsE <= RsD;
         RtE <= RtD;
         RdE <= RdD;
+        SignImmE <= SignImmD;
       end if;
     end if ;
   end process ;

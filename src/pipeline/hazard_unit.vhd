@@ -13,7 +13,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.numeric_std_unsigned.all;
+use IEEE.numeric_std.all;
 
 entity hazard_unit is
   port (
@@ -51,9 +51,9 @@ begin
 
   FOWARDING_A : process( all )
   begin
-    if ((to_integer(RsE) /= 0) and (RsE = WriteRegM) and (RegWriteW = '1')) then
+    if ((RsE /= "00000") and (RsE = WriteRegM) and (RegWriteW = '1')) then
       ForwardAE <= "10";
-    elsif ((to_integer(RsE) /= 0) and (RsE = WriteRegW) and (RegWriteW = '1')) then
+    elsif ((RsE /= "00000") and (RsE = WriteRegW) and (RegWriteW = '1')) then
       ForwardAE <= "01";
     else 
       ForwardAE <= "00";
@@ -62,9 +62,9 @@ begin
 
   FOWARDING_B : process( all )
   begin
-    if ((to_integer(RtE) /= 0) and (RtE = WriteRegM) and (RegWriteW = '1')) then
+    if ((RtE /= "00000") and (RtE = WriteRegM) and (RegWriteW = '1')) then
       ForwardBE <= "10";
-    elsif ((to_integer(RtE) /= 0) and (RtE = WriteRegW) and (RegWriteW = '1')) then
+    elsif ((RtE /= "00000") and (RtE = WriteRegW) and (RegWriteW = '1')) then
       ForwardBE <= "01";
     else 
       ForwardBE <= "00";
@@ -83,7 +83,7 @@ begin
   FlushE <= s_lwstall or s_branchstall;
 
   -- CONTROL HAZARDS
-  ForwardAD <= '1' when (to_integer(RsD) /= 0 and RsD = WriteRegM and RegWriteM = '1') else '0';
-  ForwardBD <= '1' when (to_integer(RtD) /= 0 and RtD = WriteRegM and RegWriteM = '1') else '0';
+  ForwardAD <= '1' when (RsD /= "00000" and RsD = WriteRegM and RegWriteM = '1') else '0';
+  ForwardBD <= '1' when (RtD /= "00000" and RtD = WriteRegM and RegWriteM = '1') else '0';
   
 end architecture ; -- bhv

@@ -33,7 +33,7 @@ add_subdirectory(src/)
 add_subdirectory(test/)
 
 # ghdl flags
-set(GHDL_FLAGS --std=08 --ieee=synopsys)
+set(GHDL_FLAGS --std=08 --ieee=synopsys --warn-default-binding --warn-binding --warn-specs --warn-delayed-checks --warn-unused)
 
 add_custom_target(index ALL COMMAND ghdl -i ${GHDL_FLAGS} --workdir=${CMAKE_CURRENT_BINARY_DIR} ${VHDL_SOURCES} )
 

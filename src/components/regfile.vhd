@@ -41,10 +41,10 @@ begin
     end if;
   end process;
   process(all) begin
-    if (to_integer(unsigned(ra1)) = 0) then rd1 <= X"00000000"; -- register 0 holds 0
+    if ra1 = X"00000000" then rd1 <= X"00000000"; -- register 0 holds 0
     else rd1 <= mem(to_integer(unsigned(ra1)));
     end if;
-    if (to_integer(unsigned(ra2)) = 0) then rd2 <= X"00000000";
+    if ra2 = X"00000000" then rd2 <= X"00000000";
     else rd2 <= mem(to_integer(unsigned(ra2)));
     end if;
   end process;
