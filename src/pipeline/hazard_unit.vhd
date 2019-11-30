@@ -21,26 +21,69 @@ entity hazard_unit is
     RtD:        in  std_logic_vector(4 downto 0);
     RsE:        in  std_logic_vector(4 downto 0);
     RtE:        in  std_logic_vector(4 downto 0);
+    BranchD:    in  std_logic;
     WriteRegE:  in  std_logic_vector(4 downto 0);
+    MemtoRegE:  in  std_logic;
+    RegWriteE:  in  std_logic;
     WriteRegM:  in  std_logic_vector(4 downto 0);
+    MemtoRegM:  in  std_logic;
+    RegWriteM:  in  std_logic;
     WriteRegW:  in  std_logic_vector(4 downto 0);
+    RegWriteW:  in  std_logic
     StallF:     out std_logic;
     StallD:     out std_logic;
-    BranchD:    out std_logic;
     ForwardAD:  out std_logic;
     ForwardBD:  out std_logic;
     FlushE:     out std_logic;
-    ForwardAE:  out std_logic;
-    ForwardBE:  out std_logic;
-    MemtoRegE:  out std_logic;
-    RegWriteE:  out std_logic;
-    MemtoRegM:  out std_logic;
-    RegWriteM:  out std_logic;
-    RegWriteW:  out std_logic
+    ForwardAE:  out std_logic_vector(1 downto 0);
+    ForwardBE:  out std_logic_vector(1 downto 0)
   );
 end hazard_unit ;
 
 architecture bhv of hazard_unit is
 
+  signal s_lwstall: std_logic;
+  signal s_branchstall: std_logic;
+  signal s_branchstallE, s_branchstallM: std_logic;
+
 begin
+
+  FOWARDING_A : process( all )
+  begin
+    if RsE != 0 and RsE == WriteRegM and RegWriteW then
+      ForwardAE <= "10";
+    elsif RsE != 0 and RsE == WriteRegW and RegWriteW then
+      ForwardAE <= "01";
+    else 
+      ForwardAE <= "00";
+    end if ;
+  end process ; -- FOWARDING_A
+
+  FOWARDING_B : process( all )
+  begin
+    if RtE != 0 and RtE == WriteRegM and RegWriteW then
+      ForwardBE <= "10";
+    elsif RtE != 0 and RtE == WriteRegW and RegWriteW then
+      ForwardBE <= "01";
+    else 
+      ForwardBE <= "00";
+    end if ;
+  end process ; -- FOWARDING_B
+
+  -- STALLS
+  s_lwstall <= '1' when (((RsD = RtE) or (RtD = RtE)) and MemtoRegE) else '0';
+
+  s_branchstallE <= '1' when (BranchD and RegWriteE and (WriteRegE = RsD or WriteRegE = RtD)) else '0';
+  s_branchstallM <= '1' when (BranchD and MemtoRegM and (WriteRegM = RsD or WriteRegM = RtD)) else '0';
+  s_branchstall <= s_branchstallE or s_branchstallM; 
+
+  StallF <= s_lwstall or s_branchstall;
+  StallD <= s_lwstall or s_branchstall;
+  FlushE <= s_lwstall or s_branchstall;
+
+  -- CONTROL HAZARDS
+  ForwardAD <= '1' when (RsD /= 0 and RsD = WriteRegM and RegWriteM) else '0';
+  ForwardBD <= '1' when (RtD /= 0 and RtD = WriteRegM and RegWriteM) else '0';
+
+
 end architecture ; -- bhv

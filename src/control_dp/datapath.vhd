@@ -44,7 +44,7 @@ architecture struct of datapath is
   signal s_BranchD: std_logic;
   signal s_ForwardAD, s_ForwardBD: std_logic;
   signal s_FlushE: std_logic;
-  signal s_ForwardAE, s_ForwardBE: std_logic;
+  signal s_ForwardAE, s_ForwardBE: std_logic_vector(1 downto 0);
   signal s_MemtoRegE, s_RegWriteE: std_logic;
   signal s_MemtoRegM, s_RegWriteM: std_logic;
   signal s_RegWriteW: std_logic;
