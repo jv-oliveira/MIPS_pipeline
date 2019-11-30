@@ -13,7 +13,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all; use STD.TEXTIO.all;
-use IEEE.NUMERIC_STD_UNSIGNED.all;
+use IEEE.numeric_std.all;
 
 entity dmem is -- data memory
   port (
@@ -32,10 +32,10 @@ begin
     -- read or write memory
     loop
       if clk'event and clk = '1' then
-          if (we = '1') then mem(to_integer(a(7 downto 2))) := wd;
+          if (we = '1') then mem(to_integer(unsigned(a(7 downto 2)))) := wd;
           end if;
       end if;
-      rd <= mem(to_integer(a(7 downto 2)));
+      rd <= mem(to_integer(unsigned(a(7 downto 2))));
       wait on clk, a;
     end loop;
   end process;

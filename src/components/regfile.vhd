@@ -12,7 +12,7 @@
 ----------------------------------------------------------------------
 
 library IEEE; use IEEE.std_logic_1164.all;
-use IEEE.numeric_std_unsigned.all;
+use IEEE.numeric_std.all;
 
 entity regfile is -- three-port register file
   port (
@@ -36,16 +36,16 @@ begin
   -- on falling edge of clk
   process(clk) begin
     if rising_edge(clk) then
-       if we3 = '1' then mem(to_integer(wa3)) <= wd3;
+       if we3 = '1' then mem(to_integer(unsigned(wa3))) <= wd3;
        end if;
     end if;
   end process;
   process(all) begin
-    if (to_integer(ra1) = 0) then rd1 <= X"00000000"; -- register 0 holds 0
-    else rd1 <= mem(to_integer(ra1));
+    if (to_integer(unsigned(ra1)) = 0) then rd1 <= X"00000000"; -- register 0 holds 0
+    else rd1 <= mem(to_integer(unsigned(ra1)));
     end if;
-    if (to_integer(ra2) = 0) then rd2 <= X"00000000";
-    else rd2 <= mem(to_integer(ra2));
+    if (to_integer(unsigned(ra2)) = 0) then rd2 <= X"00000000";
+    else rd2 <= mem(to_integer(unsigned(ra2)));
     end if;
   end process;
 end;

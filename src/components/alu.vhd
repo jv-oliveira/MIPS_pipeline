@@ -12,7 +12,7 @@
 ----------------------------------------------------------------------
 
 library IEEE; use IEEE.std_logic_1164.all;
-use IEEE.NUMERIC_STD_UNSIGNED.all;
+use IEEE.numeric_std.all;
 
 entity alu is
   port (
@@ -25,9 +25,11 @@ end;
 
 architecture behave of alu is
   signal condinvb, sum: std_logic_vector(31 downto 0);
+
+  constant zeros: std_logic_vector(30 downto 0) := (others => '0') ;
 begin
   condinvb <= not b when alucontrol(2) else b;
-  sum <= a + condinvb + alucontrol(2);
+  sum <= std_logic_vector(unsigned(a) + unsigned(condinvb) + unsigned(zeros & alucontrol(2)));
 
   process(all) begin
     case alucontrol(1 downto 0) is

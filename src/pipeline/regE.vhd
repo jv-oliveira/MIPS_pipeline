@@ -13,7 +13,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.numeric_std_unsigned.all;
+use IEEE.numeric_std.all;
 
 entity regE is  
   port (
