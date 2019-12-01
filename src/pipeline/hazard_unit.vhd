@@ -51,7 +51,7 @@ begin
 
   FOWARDING_A : process( all )
   begin
-    if ((RsE /= "00000") and (RsE = WriteRegM) and (RegWriteW = '1')) then
+    if ((RsE /= "00000") and (RsE = WriteRegM) and (RegWriteM = '1')) then
       ForwardAE <= "10";
     elsif ((RsE /= "00000") and (RsE = WriteRegW) and (RegWriteW = '1')) then
       ForwardAE <= "01";
@@ -76,7 +76,7 @@ begin
 
   s_branchstallE <= '1' when ((BranchD = '1') and (RegWriteE = '1') and ((WriteRegE = RsD) or (WriteRegE = RtD))) else '0';
   s_branchstallM <= '1' when ((BranchD = '1') and (MemtoRegM = '1') and ((WriteRegM = RsD) or (WriteRegM = RtD))) else '0';
-  s_branchstall <= s_branchstallE or s_branchstallM; 
+  s_branchstall <= s_branchstallE or s_branchstallM;
 
   StallF <= s_lwstall or s_branchstall;
   StallD <= s_lwstall or s_branchstall;

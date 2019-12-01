@@ -41,20 +41,22 @@ begin
   process( all )
   begin
     if rising_edge(clk)  then
-      if clr = '1' then
-        RegWriteM <= '0';
-        MemtoRegM <= '0';
-        MemWriteM <= '0';
-        ALUOutM <= (others => '0');
-        WriteDataM <= (others => '0');
-        WriteRegM <= (others => '0');
-      elsif en = '1' then
-        RegWriteM <= RegWriteE;
-        MemtoRegM <= MemtoRegE;
-        MemWriteM <= MemWriteE;
-        ALUOutM <= ALUOutE;
-        WriteDataM <= WriteDataE;
-        WriteRegM <= WriteRegE;
+      if en = '1' then
+        if clr = '1' then
+          RegWriteM <= '0';
+          MemtoRegM <= '0';
+          MemWriteM <= '0';
+          ALUOutM <= (others => '0');
+          WriteDataM <= (others => '0');
+          WriteRegM <= (others => '0');
+        else
+          RegWriteM <= RegWriteE;
+          MemtoRegM <= MemtoRegE;
+          MemWriteM <= MemWriteE;
+          ALUOutM <= ALUOutE;
+          WriteDataM <= WriteDataE;
+          WriteRegM <= WriteRegE;
+        end if;
       end if;
     end if ;
   end process ;

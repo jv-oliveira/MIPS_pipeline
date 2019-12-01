@@ -27,7 +27,7 @@ entity datapath is  -- MIPS datapath
     MemtoRegD:    in std_logic;
     MemWriteD:    in std_logic;
     ALUControlD:  in std_logic_vector(2 downto 0);
-    ALUSrcD:      in std_logic;
+    ALUSrcD:      in std_logic_vector(1 downto 0);
     RegDstD:      in std_logic;
     PCSrcD:       in std_logic_vector(1 downto 0);
     -- fom hazard unit
@@ -94,25 +94,27 @@ architecture struct of datapath is
       MemtoRegD:  in  std_logic;
       MemWriteD:  in  std_logic;
       ALUControlD:in  std_logic_vector(2 downto 0);
-      ALUSrcD:    in  std_logic;
+      ALUSrcD:    in  std_logic_vector(1 downto 0);
       RegDstD:    in  std_logic;
       RD1D:       in  std_logic_vector(31 downto 0);
       RD2D:       in  std_logic_vector(31 downto 0);
       RsD:        in  std_logic_vector(4 downto 0);
       RtD:        in  std_logic_vector(4 downto 0);
       RdD:        in  std_logic_vector(4 downto 0);
+      ZeroImmD:   in  std_logic_vector(31 downto 0);
       SignImmD:   in  std_logic_vector(31 downto 0);
       RegWriteE:  out std_logic;
       MemtoRegE:  out std_logic;
       MemWriteE:  out std_logic;
       ALUControlE:out std_logic_vector(2 downto 0);
-      ALUSrcE:    out std_logic;
+      ALUSrcE:    out std_logic_vector(1 downto 0);
       RegDstE:    out std_logic;
       RD1E:       out std_logic_vector(31 downto 0);
       RD2E:       out std_logic_vector(31 downto 0);
       RsE:        out std_logic_vector(4 downto 0);
       RtE:        out std_logic_vector(4 downto 0);
       RdE:        out std_logic_vector(4 downto 0);
+      ZeroImmE:   out std_logic_vector(31 downto 0);
       SignImmE:   out std_logic_vector(31 downto 0)
     );
   end component;
@@ -177,6 +179,13 @@ architecture struct of datapath is
     );
   end component;
 
+  component signext is
+    port (
+      a: in  std_logic_vector(15 downto 0);
+      y: out std_logic_vector(31 downto 0)
+    );
+  end component;
+
   constant NEXT_PC_STEP: std_logic_vector(31 downto 0) := X"00000004";
 
   -- pipeline signals related to Control Unit
@@ -185,9 +194,8 @@ architecture struct of datapath is
   signal s_MemWriteD  ,   s_MemWriteE   , s_MemWriteM               : std_logic := '0';
   signal s_BranchD    ,   s_BranchE     , s_BranchM                 : std_logic := '0';
   signal s_ALUControlD,   s_ALUControlE                             : std_logic_vector(2 downto 0) := (others => '0');
-  signal s_ALUSrcD    ,   s_ALUSrcE                                 : std_logic := '0';
+  signal s_ALUSrcD    ,   s_ALUSrcE                                 : std_logic_vector(1 downto 0) := (others => '0');
   signal s_RegDstD    ,   s_RegDstE                                 : std_logic := '0';
-  signal s_PCSrcM                                                   : std_logic := '0';
 
 
   -- pipeline signals related to Hazard Unit
@@ -200,7 +208,7 @@ architecture struct of datapath is
   
   signal s_PCSrcD: std_logic_vector(1 downto 0) := (others => '0');
 
-  signal s_SignImmD, s_SignImmDsh, s_SignImmE: std_logic_vector(31 downto 0) := (others => '0');
+  signal s_ZeroImmD, s_ZeroImmE, s_SignImmD, s_SignImmDsh, s_SignImmE: std_logic_vector(31 downto 0) := (others => '0');
 
   signal s_ALUOutE, s_ALUOutM, s_ALUOutW, s_ResultW, s_SrcAE, s_SrcBE: std_logic_vector(31 downto 0) := (others => '0');
 
@@ -349,9 +357,14 @@ begin
   s_RD1D <= s_RD1 when s_ForwardAD = '0' else s_ALUOutM;
   s_RD2D <= s_RD2 when s_ForwardBD = '0' else s_ALUOutM;
   
+  s_ZeroImmD <= X"0000" & s_InstrD(15 downto 0);
 
   -- signal extender
-  s_SignImmD <= X"ffff" & s_InstrD(15 downto 0) when s_InstrD(15) else X"0000" & s_InstrD(15 downto 0);
+  sigext: signext
+  port map (
+    s_InstrD(15 downto 0),
+    s_SignImmD
+  );
 
   s_SignImmDsh <= s_SignImmD(29 downto 0) & "00";
 
@@ -377,6 +390,7 @@ begin
     RsD => s_RsD,
     RtD => s_RtD,
     RdD => s_RdD,
+    ZeroImmD => s_ZeroImmD,
     SignImmD => s_SignImmD,
     RegWriteE => s_RegWriteE,
     MemtoRegE => s_MemtoRegE,
@@ -389,6 +403,7 @@ begin
     RsE => s_RsE,
     RtE => s_RtE,
     RdE => s_RdE,
+    ZeroImmE => s_ZeroImmE,
     SignImmE => s_SignImmE
   );
 
@@ -418,7 +433,16 @@ begin
     s_WriteDataE
   );
 
-  s_SrcBE <= s_WriteDataE when s_ALUSrcE = '0' else s_SignImmE;
+  srcbmux: mux4
+  generic map(32)
+  port map (
+    s_WriteDataE,
+    s_SignImmE,
+    s_ZeroImmE,
+    X"00000000",
+    s_ALUSrcE,
+    s_SrcBE
+  );
 
   mainalu: alu 
   port map (

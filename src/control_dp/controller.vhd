@@ -18,8 +18,8 @@ entity controller is -- single cycle control decoder
     op, funct:          in  std_logic_vector(5 downto 0);
     zero:               in  std_logic;
     memtoreg, memwrite: out std_logic;
-    pcsrc:    out std_logic_vector(1 downto 0);
-    alusrc:      out std_logic;
+    pcsrc:              out std_logic_vector(1 downto 0);
+    alusrc:             out std_logic_vector(1 downto 0);
     regdst, regwrite:   out std_logic;
     jump, branchD:      out std_logic;
     alucontrol:         out std_logic_vector(2 downto 0)
@@ -31,7 +31,7 @@ architecture struct of controller is
     port (
       op:                 in  std_logic_vector(5 downto 0);
       memtoreg, memwrite: out std_logic;
-      alusrc:             out std_logic;
+      alusrc:             out std_logic_vector(1 downto 0);
       branch, branch_neq: out std_logic;
       regdst, regwrite:   out std_logic;
       jump:               out std_logic;

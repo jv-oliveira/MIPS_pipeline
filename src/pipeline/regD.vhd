@@ -33,12 +33,14 @@ begin
   process( all )
   begin
     if rising_edge(clk)  then
-      if clr = '1' then
-        InstrD <= (others => '0');
-        PCPlus4D <= (others => '0');
-      elsif en = '1' then
-        InstrD <= InstrF;
-        PCPlus4D <= PCplus4F;
+      if en = '1' then
+        if clr = '1' then
+          InstrD <= (others => '0');
+          PCPlus4D <= (others => '0');
+        else 
+          InstrD <= InstrF;
+          PCPlus4D <= PCplus4F;
+        end if;
       end if;
     end if ;
   end process ;
