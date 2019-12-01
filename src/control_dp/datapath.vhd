@@ -29,7 +29,7 @@ entity datapath is  -- MIPS datapath
     ALUControlD:  in std_logic_vector(2 downto 0);
     ALUSrcD:      in std_logic;
     RegDstD:      in std_logic;
-    PCSrcD:       in std_logic;
+    PCSrcD:       in std_logic_vector(1 downto 0);
     -- fom hazard unit
     StallF, StallD:     in  std_logic;
     ForwardAD, ForwardBD: in std_logic;
@@ -198,7 +198,7 @@ architecture struct of datapath is
   signal s_RsD, s_RtD, s_RdD, s_RdE: std_logic_vector(4 downto 0) := (others => '0');
   signal s_RsE, s_RtE: std_logic_vector(4 downto 0) := (others => '0');
   
-  signal s_PCSrcD: std_logic := '0';
+  signal s_PCSrcD: std_logic_vector(1 downto 0) := (others => '0');
 
   signal s_SignImmD, s_SignImmDsh, s_SignImmE: std_logic_vector(31 downto 0) := (others => '0');
 
@@ -210,7 +210,8 @@ architecture struct of datapath is
 
   signal s_WriteDataE, s_WriteDataM: std_logic_vector(31 downto 0) := (others => '0');
 
-  signal s_PCNext, s_PCPlus4F, s_PCPlus4D, s_PCPlus4E, s_PCBranchD, s_PCF: std_logic_vector(31 downto 0) := (others => '0');
+  signal s_PCNext, s_PCPlus4F, s_PCPlus4D,
+         s_PCPlus4E, s_PCBranchD, s_PCF, s_PCJump: std_logic_vector(31 downto 0) := (others => '0');
 
   signal s_InstrF, s_InstrD: std_logic_vector(31 downto 0) := (others => '0');
 
@@ -279,7 +280,21 @@ begin
   -- FETCH
   -- ############
 
-  s_PCNext <= s_PCPlus4F when s_PCSrcD = '0' else s_PCBranchD;
+  -- add 4, advancinf pc
+  s_PCPlus4F <= std_logic_vector(unsigned(s_PCF) + unsigned(NEXT_PC_STEP));
+
+  s_PCJump <= s_PCF(31 downto 28) & s_instrD(25 downto 0) & "00";
+
+  pcnextmux: mux4
+  generic map(32)
+  port map (
+    s_PCPlus4F,
+    s_PCBranchD,
+    s_PCJump,
+    X"00000000",
+    s_PCSrcD,
+    s_PCNext
+  );
   
   pcreg_en <= not s_StallF;
   pcreg: reg_n 
@@ -292,14 +307,11 @@ begin
     s_PCF
   );
 
-  -- add 4, advancinf pc
-  s_PCPlus4F <= std_logic_vector(unsigned(s_PCF) + unsigned(NEXT_PC_STEP));
-
   -- ############
   -- IF/ID reg
   -- ############
 
-  regD_clr <= s_PCSrcD or reset;
+  regD_clr <= s_PCSrcD(0) or reset;
   regD_en <= not s_StallD;
   REG_IF_ID: regD
   port map (

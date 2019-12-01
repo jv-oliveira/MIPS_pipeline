@@ -30,7 +30,8 @@ architecture struct of mips is
       op, funct:          in  std_logic_vector(5 downto 0);
       zero:               in  std_logic;
       memtoreg, memwrite: out std_logic;
-      pcsrc, alusrc:      out std_logic;
+      pcsrc:    out std_logic_vector(1 downto 0);
+      alusrc:      out std_logic;
       regdst, regwrite:   out std_logic;
       jump, branchD:       out std_logic;
       alucontrol:         out std_logic_vector(2 downto 0)
@@ -51,7 +52,7 @@ architecture struct of mips is
       ALUControlD:  in std_logic_vector(2 downto 0);
       ALUSrcD:      in std_logic;
       RegDstD:      in std_logic;
-      PCSrcD:       in std_logic;
+      PCSrcD:       in std_logic_vector(1 downto 0);
       -- fom hazard unit
       StallF, StallD:     in  std_logic;
       ForwardAD, ForwardBD: in std_logic;
@@ -101,7 +102,8 @@ architecture struct of mips is
   end component;
 
   signal s_EqualD, s_MemtoRegD, s_MemWriteD: std_logic;
-  signal s_PCSrcD, s_ALUSrcD, s_RegDstD, s_RegWriteD, s_BranchD: std_logic;
+  signal s_ALUSrcD, s_RegDstD, s_RegWriteD, s_BranchD: std_logic;
+  signal s_PCSrcD: std_logic_vector(1 downto 0);
 
   signal s_ALUControlD: std_logic_vector(2 downto 0);
 

@@ -18,7 +18,8 @@ entity controller is -- single cycle control decoder
     op, funct:          in  std_logic_vector(5 downto 0);
     zero:               in  std_logic;
     memtoreg, memwrite: out std_logic;
-    pcsrc, alusrc:      out std_logic;
+    pcsrc:    out std_logic_vector(1 downto 0);
+    alusrc:      out std_logic;
     regdst, regwrite:   out std_logic;
     jump, branchD:      out std_logic;
     alucontrol:         out std_logic_vector(2 downto 0)
@@ -56,5 +57,6 @@ begin
 
   branchD <= branch or branch_neq;
 
-  pcsrc <= (branch and zero) or (branch_neq and not zero);
+  pcsrc(0) <= (not jump) and ((branch and zero) or (branch_neq and not zero));
+  pcsrc(1) <= jump;
 end;
