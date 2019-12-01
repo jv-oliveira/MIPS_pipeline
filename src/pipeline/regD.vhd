@@ -32,11 +32,11 @@ architecture bhv of regD is
 begin
   process( all )
   begin
-    if clr = '1' then
-      InstrD <= (others => '0');
-      PCPlus4D <= (others => '0');
-    elsif rising_edge(clk)  then
-      if en = '1' then
+    if rising_edge(clk)  then
+      if clr = '1' then
+        InstrD <= (others => '0');
+        PCPlus4D <= (others => '0');
+      elsif en = '1' then
         InstrD <= InstrF;
         PCPlus4D <= PCplus4F;
       end if;

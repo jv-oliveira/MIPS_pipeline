@@ -20,7 +20,7 @@ entity controller is -- single cycle control decoder
     memtoreg, memwrite: out std_logic;
     pcsrc, alusrc:      out std_logic;
     regdst, regwrite:   out std_logic;
-    jump:               out std_logic;
+    jump, branchD:      out std_logic;
     alucontrol:         out std_logic_vector(2 downto 0)
   );
 end;
@@ -53,6 +53,8 @@ begin
                        branch, branch_neq, regdst,
                        regwrite, jump, aluop);
   ad: aludec port map(funct, aluop, alucontrol);
+
+  branchD <= branch or branch_neq;
 
   pcsrc <= (branch and zero) or (branch_neq and not zero);
 end;

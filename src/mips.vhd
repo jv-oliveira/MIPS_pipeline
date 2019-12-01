@@ -32,7 +32,7 @@ architecture struct of mips is
       memtoreg, memwrite: out std_logic;
       pcsrc, alusrc:      out std_logic;
       regdst, regwrite:   out std_logic;
-      jump:               out std_logic;
+      jump, branchD:       out std_logic;
       alucontrol:         out std_logic_vector(2 downto 0)
     );
   end component;
@@ -126,7 +126,8 @@ begin
     alusrc => s_ALUSrcD,
     regdst => s_RegDstD,
     regwrite => s_RegWriteD,
-    jump => s_BranchD,
+    branchD => s_BranchD,
+    jump => open,
     alucontrol => s_ALUControlD
   );
 

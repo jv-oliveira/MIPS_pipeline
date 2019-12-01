@@ -51,21 +51,21 @@ architecture bhv of regE is
 begin
   process( all )
   begin
-    if clr = '1' then
-      RegWriteE <= '0';
-      MemtoRegE <= '0';
-      MemWriteE <= '0';
-      ALUControlE <= (others => '0');
-      ALUSrcE <= '0';
-      RegDstE <= '0';
-      RD1E <= (others => '0');
-      RD2E <= (others => '0');
-      RsE <= (others => '0');
-      RtE <= (others => '0');
-      RdE <= (others => '0');
-      SignImmE <= (others => '0');
-    elsif rising_edge(clk)  then
-      if en = '1' then
+    if rising_edge(clk)  then
+      if clr = '1' then
+        RegWriteE <= '0';
+        MemtoRegE <= '0';
+        MemWriteE <= '0';
+        ALUControlE <= (others => '0');
+        ALUSrcE <= '0';
+        RegDstE <= '0';
+        RD1E <= (others => '0');
+        RD2E <= (others => '0');
+        RsE <= (others => '0');
+        RtE <= (others => '0');
+        RdE <= (others => '0');
+        SignImmE <= (others => '0');
+      elsif en = '1' then
         RegWriteE <= RegWriteD;
         MemtoRegE <= MemtoRegD;
         MemWriteE <= MemWriteD;

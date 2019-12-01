@@ -37,14 +37,14 @@ architecture bhv of regW is
 begin
   process( all )
   begin
-    if clr = '1' then
-      RegWriteW <= '0';
-      MemtoRegW <= '0';
-      ReadDataW <= (others => '0');
-      ALUOutW <= (others => '0');
-      WriteRegW <= (others => '0');
-    elsif rising_edge(clk)  then
-      if en = '1' then
+    if rising_edge(clk)  then
+      if clr = '1' then
+        RegWriteW <= '0';
+        MemtoRegW <= '0';
+        ReadDataW <= (others => '0');
+        ALUOutW <= (others => '0');
+        WriteRegW <= (others => '0');
+      elsif en = '1' then
         RegWriteW <= RegWriteM;
         MemtoRegW <= MemtoRegM;
         ReadDataW <= ReadDataM;

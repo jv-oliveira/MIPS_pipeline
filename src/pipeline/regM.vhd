@@ -40,15 +40,15 @@ architecture bhv of regM is
 begin
   process( all )
   begin
-    if clr = '1' then
-      RegWriteM <= '0';
-      MemtoRegM <= '0';
-      MemWriteM <= '0';
-      ALUOutM <= (others => '0');
-      WriteDataM <= (others => '0');
-      WriteRegM <= (others => '0');
-    elsif rising_edge(clk)  then
-      if en = '1' then
+    if rising_edge(clk)  then
+      if clr = '1' then
+        RegWriteM <= '0';
+        MemtoRegM <= '0';
+        MemWriteM <= '0';
+        ALUOutM <= (others => '0');
+        WriteDataM <= (others => '0');
+        WriteRegM <= (others => '0');
+      elsif en = '1' then
         RegWriteM <= RegWriteE;
         MemtoRegM <= MemtoRegE;
         MemWriteM <= MemWriteE;
