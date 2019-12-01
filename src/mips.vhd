@@ -77,7 +77,6 @@ architecture struct of mips is
 
   component hazard_unit is
     port (
-      clock:      in  std_logic;
       RsD:        in  std_logic_vector(4 downto 0);
       RtD:        in  std_logic_vector(4 downto 0);
       RsE:        in  std_logic_vector(4 downto 0);
@@ -184,7 +183,6 @@ begin
 
   hu: hazard_unit
   port map (
-    clock => clk,
     RsD => s_RsD,
     RtD => s_RtD,
     RsE => s_RsE,

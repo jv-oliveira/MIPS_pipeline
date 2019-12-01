@@ -17,7 +17,6 @@ use IEEE.numeric_std.all;
 
 entity hazard_unit is
   port (
-    clock:      in  std_logic;
     RsD:        in  std_logic_vector(4 downto 0);
     RtD:        in  std_logic_vector(4 downto 0);
     RsE:        in  std_logic_vector(4 downto 0);
