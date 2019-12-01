@@ -8,7 +8,7 @@
 -- Data de criação : 21/11/2019       
 -- Arquivo : top_tb.vhd                                             
 ----------------------------------------------------------------------
--- Descri??o : Testbench do MIPS de ciclo único
+-- Descrição : Testbench do MIPS de ciclo único
 ----------------------------------------------------------------------
 
 library IEEE;
