@@ -180,41 +180,45 @@ architecture struct of datapath is
   constant NEXT_PC_STEP: std_logic_vector(31 downto 0) := X"00000004";
 
   -- pipeline signals related to Control Unit
-  signal s_RegWriteD  ,   s_RegWriteE   , s_RegWriteM , s_RegWriteW : std_logic;
-  signal s_MemtoRegD  ,   s_MemtoRegE   , s_MemtoRegM , s_MemtoRegW : std_logic;
-  signal s_MemWriteD  ,   s_MemWriteE   , s_MemWriteM               : std_logic;
-  signal s_BranchD    ,   s_BranchE     , s_BranchM                 : std_logic;
-  signal s_ALUControlD,   s_ALUControlE                             : std_logic_vector(2 downto 0);
-  signal s_ALUSrcD    ,   s_ALUSrcE                                 : std_logic;
-  signal s_RegDstD    ,   s_RegDstE                                 : std_logic;
-  signal s_PCSrcM                                                   : std_logic;
+  signal s_RegWriteD  ,   s_RegWriteE   , s_RegWriteM , s_RegWriteW : std_logic := '0';
+  signal s_MemtoRegD  ,   s_MemtoRegE   , s_MemtoRegM , s_MemtoRegW : std_logic := '0';
+  signal s_MemWriteD  ,   s_MemWriteE   , s_MemWriteM               : std_logic := '0';
+  signal s_BranchD    ,   s_BranchE     , s_BranchM                 : std_logic := '0';
+  signal s_ALUControlD,   s_ALUControlE                             : std_logic_vector(2 downto 0) := (others => '0');
+  signal s_ALUSrcD    ,   s_ALUSrcE                                 : std_logic := '0';
+  signal s_RegDstD    ,   s_RegDstE                                 : std_logic := '0';
+  signal s_PCSrcM                                                   : std_logic := '0';
 
 
   -- pipeline signals related to Hazard Unit
-  signal s_StallF, s_StallD: std_logic;
-  signal s_ForwardAD, s_ForwardBD: std_logic;
-  signal s_FlushE: std_logic;
-  signal s_ForwardAE, s_ForwardBE: std_logic_vector(1 downto 0);
-  signal s_RsD, s_RtD, s_RdD, s_RdE: std_logic_vector(4 downto 0);
-  signal s_RsE, s_RtE: std_logic_vector(4 downto 0);
+  signal s_StallF, s_StallD: std_logic := '0';
+  signal s_ForwardAD, s_ForwardBD: std_logic := '0';
+  signal s_FlushE: std_logic := '0';
+  signal s_ForwardAE, s_ForwardBE: std_logic_vector(1 downto 0) := (others => '0');
+  signal s_RsD, s_RtD, s_RdD, s_RdE: std_logic_vector(4 downto 0) := (others => '0');
+  signal s_RsE, s_RtE: std_logic_vector(4 downto 0) := (others => '0');
   
-  signal s_PCSrcD: std_logic;
+  signal s_PCSrcD: std_logic := '0';
 
-  signal s_SignImmD, s_SignImmDsh, s_SignImmE: std_logic_vector(31 downto 0) ;
+  signal s_SignImmD, s_SignImmDsh, s_SignImmE: std_logic_vector(31 downto 0) := (others => '0');
 
-  signal s_ALUOutE, s_ALUOutM, s_ALUOutW, s_ResultW, s_SrcAE, s_SrcBE: std_logic_vector(31 downto 0);
+  signal s_ALUOutE, s_ALUOutM, s_ALUOutW, s_ResultW, s_SrcAE, s_SrcBE: std_logic_vector(31 downto 0) := (others => '0');
 
-  signal s_RD1, s_RD2, s_RD1D, s_RD2D, s_RD1E, s_RD2E: std_logic_vector(31 downto 0);
+  signal s_RD1, s_RD2, s_RD1D, s_RD2D, s_RD1E, s_RD2E: std_logic_vector(31 downto 0) := (others => '0');
 
-  signal s_WriteRegE, s_WriteRegM, s_WriteRegW: std_logic_vector(4 downto 0);
+  signal s_WriteRegE, s_WriteRegM, s_WriteRegW: std_logic_vector(4 downto 0) := (others => '0');
 
-  signal s_WriteDataE, s_WriteDataM: std_logic_vector(31 downto 0);
+  signal s_WriteDataE, s_WriteDataM: std_logic_vector(31 downto 0) := (others => '0');
 
-  signal s_PCNext, s_PCPlus4F, s_PCPlus4D, s_PCPlus4E, s_PCBranchD, s_PCF: std_logic_vector(31 downto 0);
+  signal s_PCNext, s_PCPlus4F, s_PCPlus4D, s_PCPlus4E, s_PCBranchD, s_PCF: std_logic_vector(31 downto 0) := (others => '0');
 
-  signal s_InstrF, s_InstrD: std_logic_vector(31 downto 0);
+  signal s_InstrF, s_InstrD: std_logic_vector(31 downto 0) := (others => '0');
 
-  signal s_ReadDataM, s_ReadDataW: std_logic_vector(31 downto 0);
+  signal s_ReadDataM, s_ReadDataW: std_logic_vector(31 downto 0) := (others => '0');
+
+  signal pcreg_en, regD_en, clk_regfile: std_logic;
+
+  signal regD_clr, regE_clr, regM_clr, regW_clr: std_logic;
 
 begin
   -- ############
@@ -277,12 +281,13 @@ begin
 
   s_PCNext <= s_PCPlus4F when s_PCSrcD = '0' else s_PCBranchD;
   
+  pcreg_en <= not s_StallF;
   pcreg: reg_n 
   generic map(32) 
   port map (
     clk, 
-    '0',
-    s_StallF, 
+    reset,
+    pcreg_en, 
     s_PCnext, 
     s_PCF
   );
@@ -294,11 +299,13 @@ begin
   -- IF/ID reg
   -- ############
 
+  regD_clr <= s_PCSrcD or reset;
+  regD_en <= not s_StallD;
   REG_IF_ID: regD
   port map (
     clk => clk,
-    clr => s_PCSrcD,
-    en => s_StallD,
+    clr => regD_clr,
+    en => regD_en,
     InstrF => s_InstrF,
     PCplus4F => s_PCplus4F,
     InstrD => s_InstrD,
@@ -310,9 +317,10 @@ begin
   -- ############
 
   -- register file logic
+  clk_regfile <= not clk;
   rf: regfile 
   port map (
-    clk,
+    clk_regfile,
     s_RegWriteW,
     s_InstrD(25 downto 21),
     s_InstrD(20 downto 16),
@@ -340,11 +348,11 @@ begin
   -- ############
   -- ID/EX reg
   -- ############
-
+  regE_clr <= s_FlushE or reset;
   REG_ID_EX: regE
   port map (
     clk => clk,
-    clr => s_FlushE,
+    clr => regE_clr,
     en => '1',
     RegWriteD => s_RegWriteD,
     MemtoRegD => s_MemtoRegD,
@@ -419,10 +427,11 @@ begin
   -- ############
   -- EX/MEM reg
   -- ############
+  regM_clr <= reset;
   REG_EX_MEM: regM
   port map (
     clk => clk,
-    clr => '0',
+    clr => regM_clr,
     en => '1',
     RegWriteE => s_RegWriteE,
     MemtoRegE => s_MemtoRegE,
@@ -446,11 +455,11 @@ begin
   WriteRegM <= s_WriteRegM;
 
   -- MEM/WB reg
-
+  regW_clr <= reset;
   REG_MEM_WB: regW
   port map (
     clk => clk,
-    clr => reset,
+    clr => regW_clr,
     en => '1',
     RegWriteM => s_RegWriteM,
     MemtoRegM => s_MemtoRegM,
