@@ -41,5 +41,5 @@ add_custom_target(index ALL COMMAND ghdl -i ${GHDL_FLAGS} --workdir=${CMAKE_CURR
 set(CTEST_OUTPUT_ON_FAILURE 1)
 
 # Create placeholder for wave traces
-# file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/trace/")
-# message("-- Placeholder for trace files created at: ${CMAKE_CURRENT_BINARY_DIR}/trace/")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/trace/")
+message("-- Placeholder for trace files created at: ${CMAKE_CURRENT_BINARY_DIR}/trace/")
