@@ -14,7 +14,7 @@ main:   addi $2, $0, 5      # initialize $2 = 5   0   20020005
         beq $5, $7, end     # shouldn't be taken  18  10a7000a
         slt $4, $3, $4      # $4 = 12 < 7 = 0     1c  0064202a
         beq $4, $0, around  # should be taken     20  10800001
-        addi $5, $0, 0      # shouldn?t happen    24  20050000
+        addi $5, $0, 0      # shouldn't happen    24  20050000
 around: slt $4, $7, $2      # $4 = 3 < 5 = 1      28  00e2202a
         add $7, $4, $5      # $7 = 1 + 11 = 12    2c  00853820
         sub $7, $7, $2      # $7 = 12 - 5 = 7     30  00e23822
