@@ -16,6 +16,9 @@ use IEEE.std_logic_1164.all; use STD.TEXTIO.all;
 use ieee.numeric_std.all;
 
 entity imem is -- instruction memory
+  generic (
+    filename : string := "memfile.dat"
+  );
   port (
     a:  in  std_logic_vector(5 downto 0);
     rd: out std_logic_vector(31 downto 0)
@@ -37,7 +40,7 @@ begin
       mem(i) := (others => '0');
     end loop;
     index := 0;
-    FILE_OPEN(mem_file, "memfile.dat", READ_MODE);
+    FILE_OPEN(mem_file, filename, READ_MODE);
     while not endfile(mem_file) loop
       readline(mem_file, L);
       result := 0;
@@ -48,7 +51,7 @@ begin
         elsif 'a' <= ch and ch <= 'f' then
            result := character'pos(ch) - character'pos('a')+10;
         else report "Format error on line " & integer'image(index)
-             severity error;
+             severity failure;
         end if;
         mem(index)(35-i*4 downto 32-i*4) := std_logic_vector(to_unsigned(result, 4));
       end loop;

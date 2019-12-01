@@ -1,23 +1,23 @@
 ----------------------------------------------------------------------
--- Disciplina : PCS3612 - Organização e Arquitetura de Computadores I 
+-- Disciplina : PCS3612 ? Organização e Arquitetura de Computadores I 
 -- Professor(a): Profa. Dra. Cíntia Borges Margi                      
 -- Projeto :  Implementação do MIPS pipeline                          
 -- Autores :                                                          
 --   João Victor Marques de Oliveira | Nº USP: 9344790                
 --   Matheus Felipe Gomes            | Nº USP: 8993198                
--- Data de criação : 21/11/2019       
--- Arquivo : top_tb.vhd                                             
+-- Data de criação : 01/12/2019       
+-- Arquivo : top_jump_tb.vhd                                             
 ----------------------------------------------------------------------
--- Descrição : Testbench do MIPS de ciclo único
+-- Descrição :Testbench do MIPS para a instrução j
 ----------------------------------------------------------------------
 
 library IEEE;
 use IEEE.std_logic_1164.all; use IEEE.numeric_std_unsigned.all;
 
-entity top_tb is
-end top_tb;
+entity top_jump_tb is
+end top_jump_tb;
 
-architecture test of top_tb is
+architecture test of top_jump_tb is
 
   signal writedata, dataadr:    std_logic_vector(31 downto 0);
   signal clk, reset,  memwrite: std_logic;
@@ -38,7 +38,7 @@ begin
 
   -- instantiate device to be tested
   dut: top 
-  generic map("top_tb.dat")
+  generic map("top_jump_tb.dat")
   port map(clk, reset, writedata, dataadr, memwrite);
 
   -- Generate clock with 10 ns period

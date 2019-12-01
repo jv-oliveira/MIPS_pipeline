@@ -15,6 +15,9 @@ library IEEE;
 use IEEE.std_logic_1164.all; use IEEE.numeric_std.all;
 
 entity top is -- top-level design for testing
+  generic (
+    filename : string := "memfile.dat"
+  );
   port (
     clk, reset:           in     std_logic;
     writedata, dataadr:   buffer std_logic_vector(31 downto 0);
@@ -34,6 +37,9 @@ architecture test of top is
   end component;
 
   component imem
+    generic (
+      filename : string := "memfile.dat"
+    );
     port (
       a:  in  std_logic_vector(5 downto 0);
       rd: out std_logic_vector(31 downto 0)
@@ -53,6 +59,8 @@ begin
   -- instantiate processor and memories
   mips1: mips port map(clk, reset, pc, instr, memwrite, dataadr,
                        writedata, readdata);
-  imem1: imem port map(pc(7 downto 2), instr);
+  imem1: imem 
+  generic map (filename)
+  port map(pc(7 downto 2), instr);
   dmem1: dmem port map(clk, memwrite, dataadr, writedata, readdata);
 end;

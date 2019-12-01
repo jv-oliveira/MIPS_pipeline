@@ -20,9 +20,9 @@ macro (add_test_sources)
 
         add_custom_target("${TEST_NAME}" COMMAND ghdl -m -g ${GHDL_FLAGS} --workdir=${CMAKE_BINARY_DIR} ${ENTITY_NAME} DEPENDS index )
         list (APPEND VHDL_SOURCES "${CMAKE_SOURCE_DIR}/${FILE_SRC}")
-        add_custom_target("${TEST_NAME}_cp_dat_files" COMMAND sh -c "ln -s ${CMAKE_BINARY_DIR}/${ENTITY_NAME}.dat ${CMAKE_CURRENT_BINARY_DIR}/memfile.dat" || true)
-        add_test(NAME "${TEST_NAME}" COMMAND ghdl -r ${GHDL_FLAGS} -g --workdir=${CMAKE_BINARY_DIR} ${ENTITY_NAME} --vcd=${TRACE_PATH} --stop-time=10us)
-        add_dependencies("${TEST_NAME}" "${TEST_NAME}_cp_dat_files")
+        add_custom_target("${TEST_NAME}_link_dat_files" COMMAND sh -c "ln -s ${CMAKE_BINARY_DIR}/${ENTITY_NAME}.dat ${CMAKE_CURRENT_BINARY_DIR}" || true)
+        add_test(NAME "${TEST_NAME}" COMMAND ghdl -r ${GHDL_FLAGS} -g --workdir=${CMAKE_BINARY_DIR} ${ENTITY_NAME} --vcd=${TRACE_PATH} --stop-time=15us)
+        add_dependencies("${TEST_NAME}" "${TEST_NAME}_link_dat_files")
         add_dependencies(check "${TEST_NAME}")
 
         message("-- Adding VHDL Test: ${CMAKE_SOURCE_DIR}/${FILE_SRC}")
