@@ -54,10 +54,8 @@ begin
 
   -- check that 7 gets written to address 84 at end of program
   process (clk) 
-  variable clock_count: integer := 0;
   begin
     if falling_edge(clk) then
-      clock_count := clock_count + 1;
       if memwrite = '1' then
         if (to_integer(dataadr) = 84 and to_integer(writedata) = 7) then
           report "NO ERRORS: Simulation succeeded" severity note;
@@ -65,8 +63,6 @@ begin
         elsif (to_integer(dataadr) /= 80) then
           report "Simulation failed" severity failure;
         end if;
-      elsif (clock_count > 100) then
-        report "Simulation failed" severity failure;
       end if ;
     end if;
   end process;

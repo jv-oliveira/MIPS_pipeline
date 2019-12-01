@@ -100,10 +100,6 @@ architecture struct of mips is
     );
   end component;
 
-  signal memtoreg, alusrc, regdst, regwrite, jump, pcsrc: std_logic;
-  signal zero: std_logic;
-  signal alucontrol: std_logic_vector(2 downto 0);
-
   signal s_EqualD, s_MemtoRegD, s_MemWriteD: std_logic;
   signal s_PCSrcD, s_ALUSrcD, s_RegDstD, s_RegWriteD, s_BranchD: std_logic;
 

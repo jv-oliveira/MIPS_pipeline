@@ -74,8 +74,8 @@ begin
   -- STALLS
   s_lwstall <= '1' when (((RsD = RtE) or (RtD = RtE)) and (MemtoRegE = '1')) else '0';
 
-  s_branchstallE <= '1' when ((BranchD = '1') and (RegWriteE = '1') and (WriteRegE = RsD or WriteRegE = RtD)) else '0';
-  s_branchstallM <= '1' when ((BranchD = '1') and (MemtoRegM = '1') and (WriteRegM = RsD or WriteRegM = RtD)) else '0';
+  s_branchstallE <= '1' when ((BranchD = '1') and (RegWriteE = '1') and ((WriteRegE = RsD) or (WriteRegE = RtD))) else '0';
+  s_branchstallM <= '1' when ((BranchD = '1') and (MemtoRegM = '1') and ((WriteRegM = RsD) or (WriteRegM = RtD))) else '0';
   s_branchstall <= s_branchstallE or s_branchstallM; 
 
   StallF <= s_lwstall or s_branchstall;
@@ -83,7 +83,7 @@ begin
   FlushE <= s_lwstall or s_branchstall;
 
   -- CONTROL HAZARDS
-  ForwardAD <= '1' when (RsD /= "00000" and RsD = WriteRegM and RegWriteM = '1') else '0';
-  ForwardBD <= '1' when (RtD /= "00000" and RtD = WriteRegM and RegWriteM = '1') else '0';
+  ForwardAD <= '1' when ((RsD /= "00000") and (RsD = WriteRegM) and (RegWriteM = '1')) else '0';
+  ForwardBD <= '1' when ((RtD /= "00000") and (RtD = WriteRegM) and (RegWriteM = '1')) else '0';
   
 end architecture ; -- bhv
